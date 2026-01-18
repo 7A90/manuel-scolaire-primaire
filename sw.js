@@ -13,6 +13,7 @@ const ASSETS_TO_CACHE = [
   './icone-192.png',
   './icone-512.png',
   'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js'
+  'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js'
 ];
 
 // Installation : on télécharge les fichiers dans le cache
@@ -32,3 +33,4 @@ self.addEventListener('fetch', (event) => {
     })
   );
 });
+
