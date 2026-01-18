@@ -8,66 +8,15 @@
     <style>
         body { margin: 0; font-family: sans-serif; background-color: #333; color: white; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
         .header { background: #222; border-bottom: 2px solid #555; padding: 10px; }
-        #bookSearch { width: 100%; padding: 12px; border-radius: 5px; border: none; background: #444; color: white; box-sizing: border-box; margin-bottom: 10px; font-size: 16px; }
-        .menu { overflow-x: auto; white-space: nowrap; padding-bottom: 5px; }
-        button { background: #555; color: white; border: none; padding: 10px 15px; margin-right: 10px; border-radius: 5px; cursor: pointer; }
+        #bookSearch { width: 100%; padding: 10px; border-radius: 5px; border: none; background: #444; color: white; box-sizing: border-box; margin-bottom: 10px; }
+        .menu { overflow-x: auto; white-space: nowrap; padding-bottom: 5px; display: flex; gap: 10px; }
+        button { background: #555; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; }
         button.active { background: #007bff; font-weight: bold; }
-        .controls { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: #222; border-top: 1px solid #444; }
+        .controls { display: flex; justify-content: space-between; align-items: center; padding: 10px; background: #222; }
         .canvas-container { flex-grow: 1; overflow-y: auto; display: flex; justify-content: center; background: #444; padding: 10px; }
-        canvas { box-shadow: 0 0 20px rgba(0,0,0,0.5); max-width: 100%; }
+        canvas { box-shadow: 0 0 20px rgba(0,0,0,0.5); max-width: 100%; height: auto !important; }
     </style>
 </head>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
-<script>
-    const pdfjsLib = window['pdfjs-dist/build/pdf'];
-    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
-
-    let pdfDoc = null, pageNum = 1, pageIsRendering = false, pageNumPending = null;
-    const canvas = document.querySelector('#pdf-render'), ctx = canvas.getContext('2d');
-
-    function renderPage(num) {
-        pageIsRendering = true;
-        pdfDoc.getPage(num).then(page => {
-            const viewport = page.getViewport({ scale: canvas.parentElement.clientWidth / page.getViewport({scale: 1.0}).width });
-            canvas.height = viewport.height;
-            canvas.width = viewport.width;
-            const renderCtx = { canvasContext: ctx, viewport: viewport };
-            page.render(renderCtx).promise.then(() => {
-                pageIsRendering = false;
-                if (pageNumPending !== null) { renderPage(pageNumPending); pageNumPending = null; }
-            });
-            document.getElementById('page-num').textContent = num;
-        });
-    }
-
-    function onPrevPage() { if (pageNum <= 1) return; pageNum--; renderPage(pageNum); }
-    function onNextPage() { if (pageNum >= pdfDoc.numPages) return; pageNum++; renderPage(pageNum); }
-
-    function changeBook(url, btn) {
-        document.querySelectorAll('button').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        loadPDF(url);
-    }
-
-    function loadPDF(url) {
-        pdfjsLib.getDocument(url).promise.then(pdf => {
-            pdfDoc = pdf;
-            document.getElementById('page-count').textContent = pdf.numPages;
-            pageNum = 1;
-            renderPage(pageNum);
-        });
-    }
-
-    document.getElementById('bookSearch').addEventListener('input', e => {
-        const term = e.target.value.toLowerCase();
-        document.querySelectorAll('#bookList button').forEach(btn => {
-            btn.style.display = btn.textContent.toLowerCase().includes(term) ? "inline-block" : "none";
-        });
-    });
-
-    if ('serviceWorker' in navigator) { navigator.serviceWorker.register('./sw.js'); }
-    loadPDF('livre1.pdf');
-</script>
 <body>
     <div class="header">
         <input type="text" id="bookSearch" placeholder="Rechercher un livre...">
@@ -78,10 +27,62 @@
         </div>
     </div>
     <div class="controls">
-        <button onclick="onPrevPage()">⬅️</button>
+        <button onclick="onPrevPage()">⬅️ Précédent</button>
         <span>Page <span id="page-num">1</span> / <span id="page-count">-</span></span>
-        <button onclick="onNextPage()">➡️</button>
+        <button onclick="onNextPage()">Suivant ➡️</button>
     </div>
     <div class="canvas-container">
         <canvas id="pdf-render"></canvas>
     </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+    <script>
+        const pdfjsLib = window['pdfjs-dist/build/pdf'];
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
+
+        let pdfDoc = null, pageNum = 1, isRendering = false;
+        const canvas = document.querySelector('#pdf-render'), ctx = canvas.getContext('2d');
+
+        function renderPage(num) {
+            isRendering = true;
+            pdfDoc.getPage(num).then(page => {
+                const parentWidth = canvas.parentElement.clientWidth - 20;
+                const viewport = page.getViewport({ scale: parentWidth / page.getViewport({scale:1}).width });
+                canvas.height = viewport.height;
+                canvas.width = viewport.width;
+                page.render({ canvasContext: ctx, viewport: viewport }).promise.then(() => {
+                    isRendering = false;
+                });
+                document.getElementById('page-num').textContent = num;
+            });
+        }
+
+        function onPrevPage() { if (pageNum <= 1 || isRendering) return; pageNum--; renderPage(pageNum); }
+        function onNextPage() { if (pageNum >= pdfDoc.numPages || isRendering) return; pageNum++; renderPage(pageNum); }
+
+        function changeBook(url, btn) {
+            document.querySelectorAll('#bookList button').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            loadPDF(url);
+        }
+
+        function loadPDF(url) {
+            pdfjsLib.getDocument(url).promise.then(pdf => {
+                pdfDoc = pdf;
+                document.getElementById('page-count').textContent = pdf.numPages;
+                pageNum = 1;
+                renderPage(pageNum);
+            }).catch(() => alert("Erreur de chargement du PDF"));
+        }
+
+        document.getElementById('bookSearch').addEventListener('input', e => {
+            const term = e.target.value.toLowerCase();
+            document.querySelectorAll('#bookList button').forEach(btn => {
+                btn.style.display = btn.textContent.toLowerCase().includes(term) ? "inline-block" : "none";
+            });
+        });
+
+        if ('serviceWorker' in navigator) { navigator.serviceWorker.register('./sw.js'); }
+        loadPDF('livre1.pdf');
+    </script>
+</body>
+</html>
