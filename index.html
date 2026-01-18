@@ -1,235 +1,118 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
+    <link rel="manifest" href="manifest.json">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ma Bibliothèque PWA</title>
+    <title>Ma Bibliothèque PDF</title>
+    <link rel="manifest" href="manifest.json">
     <style>
-        body { 
-            margin: 0; 
-            font-family: sans-serif; 
-            background-color: #333; 
-            color: white; 
-            display: flex; 
-            flex-direction: column; 
-            height: 100vh; 
-            overflow: hidden; 
-        }
-        .header { 
-            background: #222; 
-            border-bottom: 2px solid #555; 
-            padding: 10px; 
-        }
-        #bookSearch { 
-            width: 100%; 
-            padding: 10px; 
-            border-radius: 5px; 
-            border: none; 
-            background: #444; 
-            color: white; 
-            box-sizing: border-box; 
-            margin-bottom: 10px; 
-        }
-        .menu { 
-            overflow-x: auto; 
-            white-space: nowrap; 
-            padding-bottom: 5px; 
-            display: flex; 
-            gap: 10px; 
-        }
-        button { 
-            background: #555; 
-            color: white; 
-            border: none; 
-            padding: 10px 15px; 
-            border-radius: 5px; 
-            cursor: pointer; 
-        }
-        button:hover {
-            background: #666;
-        }
-        button.active { 
-            background: #007bff; 
-            font-weight: bold; 
-        }
-        .controls { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            padding: 10px; 
-            background: #222; 
-        }
-        .canvas-container { 
-            flex-grow: 1; 
-            overflow-y: auto; 
-            display: flex; 
-            justify-content: center; 
-            background: #444; 
-            padding: 10px; 
-        }
-        canvas { 
-            box-shadow: 0 0 20px rgba(0,0,0,0.5); 
-            max-width: 100%; 
-            height: auto !important; 
-        }
-        .upload-section {
-            padding: 10px;
-            background: #222;
-            border-bottom: 2px solid #555;
-        }
-        .upload-btn {
-            background: #28a745;
-            width: 100%;
-            padding: 12px;
-            font-size: 16px;
-        }
-        .upload-btn:hover {
-            background: #218838;
-        }
-        .no-pdf {
-            text-align: center;
-            padding: 40px;
-            color: #aaa;
-        }
+        body { margin: 0; font-family: sans-serif; background-color: #333; color: white; display: flex; flex-direction: column; height: 100vh; }
+        
+        /* Menu de sélection */
+        .menu { padding: 15px; background: #222; overflow-x: auto; white-space: nowrap; border-bottom: 2px solid #555; }
+        button { background: #555; color: white; border: none; padding: 10px 15px; margin-right: 10px; border-radius: 5px; cursor: pointer; }
+        button:hover { background: #007bff; }
+        button.active { background: #007bff; font-weight: bold; }
+
+        /* Affichage du PDF */
+        #pdf-render { width: 100%; max-width: 800px; margin: auto; display: block; }
+        .canvas-container { flex-grow: 1; overflow-y: auto; padding: 10px; }
     </style>
 </head>
 <body>
-    <div class="header">
-        <input type="text" id="bookSearch" placeholder="Rechercher un livre...">
-        <div class="menu" id="bookList"></div>
+
+    <div class="menu">
+        <button onclick="changeBook('livre1.pdf', this)" class="active">Livre 1</button>
+        <button onclick="changeBook('livre2.pdf', this)">Livre 2</button>
+        <button onclick="changeBook('livre3.pdf', this)">Livre 3</button>
+        <button onclick="changeBook('livre4.pdf', this)">Livre 4</button>
+        <button onclick="changeBook('livre5.pdf', this)">Livre 5</button>
+        <button onclick="changeBook('livre6.pdf', this)">Livre 6</button>
     </div>
-    
-    <div class="upload-section">
-        <input type="file" id="pdfUpload" accept=".pdf" style="display: none;" multiple>
-        <button class="upload-btn" onclick="document.getElementById('pdfUpload').click()">
-            📚 Ajouter des livres PDF
-        </button>
-    </div>
-    
-    <div class="controls">
-        <button onclick="onPrevPage()">⬅️ Précédent</button>
-        <span>Page <span id="page-num">-</span> / <span id="page-count">-</span></span>
-        <button onclick="onNextPage()">Suivant ➡️</button>
-    </div>
-    
+
     <div class="canvas-container">
         <canvas id="pdf-render"></canvas>
-        <div class="no-pdf" id="noPdfMessage">
-            📖 Aucun livre chargé. Veuillez ajouter des fichiers PDF.
-        </div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
     <script>
-        const pdfjsLib = window['pdfjs-dist/build/pdf'];
-        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
+        let pdfDoc = null,
+    pageNum = 1,
+    pageIsRendering = false,
+    pageNumPending = null,
+    canvas = document.querySelector('#pdf-render'),
+    ctx = canvas.getContext('2d');
 
-        let pdfDoc = null, pageNum = 1, isRendering = false;
-        let books = [];
-        let currentBookIndex = -1;
-        
-        const canvas = document.querySelector('#pdf-render');
-        const ctx = canvas.getContext('2d');
-        const noPdfMessage = document.getElementById('noPdfMessage');
+function renderPage(num) {
+    pageIsRendering = true;
+    pdfDoc.getPage(num).then(page => {
+        const viewport = page.getViewport({ scale: canvas.parentElement.clientWidth / page.getViewport({scale: 1.0}).width });
+        canvas.height = viewport.height;
+        canvas.width = viewport.width;
 
-        function renderPage(num) {
-            if (!pdfDoc) return;
-            
-            isRendering = true;
-            noPdfMessage.style.display = 'none';
-            canvas.style.display = 'block';
-            
-            pdfDoc.getPage(num).then(page => {
-                const parentWidth = canvas.parentElement.clientWidth - 20;
-                const viewport = page.getViewport({ scale: parentWidth / page.getViewport({scale:1}).width });
-                canvas.height = viewport.height;
-                canvas.width = viewport.width;
-                page.render({ canvasContext: ctx, viewport: viewport }).promise.then(() => {
-                    isRendering = false;
-                });
-                document.getElementById('page-num').textContent = num;
-            });
-        }
-
-        function onPrevPage() { 
-            if (pageNum <= 1 || isRendering) return; 
-            pageNum--; 
-            renderPage(pageNum); 
-        }
-        
-        function onNextPage() { 
-            if (!pdfDoc || pageNum >= pdfDoc.numPages || isRendering) return; 
-            pageNum++; 
-            renderPage(pageNum); 
-        }
-
-        function changeBook(index, btn) {
-            document.querySelectorAll('#bookList button').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            currentBookIndex = index;
-            loadPDF(books[index].data);
-        }
-
-        function loadPDF(data) {
-            pdfjsLib.getDocument(data).promise.then(pdf => {
-                pdfDoc = pdf;
-                document.getElementById('page-count').textContent = pdf.numPages;
-                pageNum = 1;
-                renderPage(pageNum);
-            }).catch(() => {
-                alert("Erreur de chargement du PDF");
-            });
-        }
-
-        function updateBookList() {
-            const bookList = document.getElementById('bookList');
-            bookList.innerHTML = '';
-            
-            books.forEach((book, index) => {
-                const btn = document.createElement('button');
-                btn.textContent = book.name;
-                btn.onclick = function() { changeBook(index, this); };
-                if (index === currentBookIndex) {
-                    btn.classList.add('active');
-                }
-                bookList.appendChild(btn);
-            });
-        }
-
-        document.getElementById('pdfUpload').addEventListener('change', function(e) {
-            const files = Array.from(e.target.files);
-            
-            files.forEach(file => {
-                if (file.type === 'application/pdf') {
-                    const reader = new FileReader();
-                    reader.onload = function(ev) {
-                        books.push({
-                            name: file.name,
-                            data: new Uint8Array(ev.target.result)
-                        });
-                        updateBookList();
-                        
-                        if (books.length === 1) {
-                            const firstBtn = document.querySelector('#bookList button');
-                            changeBook(0, firstBtn);
-                        }
-                    };
-                    reader.readAsArrayBuffer(file);
-                }
-            });
-            
-            e.target.value = '';
+        const renderCtx = { canvasContext: ctx, viewport: viewport };
+        page.render(renderCtx).promise.then(() => {
+            pageIsRendering = false;
+            if (pageNumPending !== null) {
+                renderPage(pageNumPending);
+                pageNumPending = null;
+            }
         });
 
-        document.getElementById('bookSearch').addEventListener('input', e => {
-            const term = e.target.value.toLowerCase();
-            document.querySelectorAll('#bookList button').forEach(btn => {
-                btn.style.display = btn.textContent.toLowerCase().includes(term) ? "inline-block" : "none";
-            });
-        });
+        // Mise à jour du compteur de pages
+        document.getElementById('page-num').textContent = num;
+    });
+}
 
-        // Initialize
-        canvas.style.display = 'none';
+function queueRenderPage(num) {
+    if (pageIsRendering) {
+        pageNumPending = num;
+    } else {
+        renderPage(num);
+    }
+}
+
+function onPrevPage() {
+    if (pageNum <= 1) return;
+    pageNum--;
+    queueRenderPage(pageNum);
+}
+
+function onNextPage() {
+    if (pageNum >= pdfDoc.numPages) return;
+    pageNum++;
+    queueRenderPage(pageNum);
+}
+
+function loadPDF(url) {
+    pdfjsLib.getDocument(url).promise.then(pdfDoc_ => {
+        pdfDoc = pdfDoc_;
+        document.getElementById('page-count').textContent = pdfDoc.numPages;
+        pageNum = 1; // Réinitialiser à la page 1 pour un nouveau livre
+        renderPage(pageNum);
+      });
+     }
     </script>
+    <script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js')
+        .then(reg => console.log('Service Worker enregistré !'))
+        .catch(err => console.log('Erreur SW:', err));
+       });
+      }
+     </script>
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js')
+        .then(reg => console.log('Service Worker enregistré !'))
+        .catch(err => console.log('Erreur SW:', err));
+       });
+      }
+     </script>
+
+
 </body>
 </html>
