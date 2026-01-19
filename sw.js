@@ -4,12 +4,12 @@ const assets = [
   './index.html',
   './manifest.json',
   // مسارات الكتب في مجلد manuel
-  './manuel/livre1.pdf',
-  './manuel/livre2.pdf',
-  './manuel/livre3.pdf',
-  './manuel/livre4.pdf',
-  './manuel/livre5.pdf',
-  './manuel/livre6.pdf'
+  './manuel/3m.pdf',
+  './manuel/3c.pdf',
+  './manuel/4m.pdf',
+  './manuel/4c.pdf',
+  './manuel/5m.pdf',
+  './manuel/5c.pdf'
 ];
 
 // مرحلة التثبيت: حفظ الملفات في الذاكرة التخزينية (Cache)
@@ -42,3 +42,4 @@ self.addEventListener('fetch', event => {
     })
   );
 });
+
