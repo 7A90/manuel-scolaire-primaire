@@ -117,30 +117,21 @@
 
    Function openBook(fileName) { 
 
-    // بناء المسار الصحيح 
+    // الحصول على الرابط الكامل لموقعك 
 
-    Const filePath = `./manuel/${fileName}`; 
+    Const fullUrl = window.location.origin + window.location.pathname + ‘manuel/’ + fileName; 
 
      
 
-    // إنشاء رابط وهمي والضغط عليه برمجياً لضمان استجابة المتصفح 
+    // استخدام عارض جوجل لفتح الملف 
 
-    Const link = document.createElement(‘a’); 
+    Const googleViewerUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(fullUrl)}&embedded=true`; 
 
-    Link.href = filePath; 
+     
 
-    Link.target = ‘_blank’; // لفتح الكتاب في صفحة جديدة 
-
-    Link.rel = ‘noopener noreferrer’; 
-
-    Document.body.appendChild(link); 
-
-    Link.click(); 
-
-    Document.body.removeChild(link); 
+    Window.location.href = googleViewerUrl; 
 
 } 
-
 </script> 
 </body>
 </html>
