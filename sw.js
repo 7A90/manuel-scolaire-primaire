@@ -4,7 +4,12 @@ const assets = [
   './index.html',
   './manifest.json',
   // مسارات الكتب في مجلد manuel
-  './manuel/cinqc.pdf'
+  './manuel/cinqc.pdf',
+  './manuel/cinqm.pdf',
+  './manuel/qatc.pdf',
+  './manuel/qatm.pdf',
+  './manuel/tric.pdf',
+  './manuel/trim.pdf'
 ];
 
 // مرحلة التثبيت: حفظ الملفات في الذاكرة التخزينية (Cache)
@@ -37,5 +42,6 @@ self.addEventListener('fetch', event => {
     })
   );
 });
+
 
 
