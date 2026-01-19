@@ -110,23 +110,27 @@
 
 <script> 
 
-   Function openBook(fileName) { 
+   function openBook(fileName) {
+        const viewer = document.getElementById('pdf-viewer');
+        const welcome = document.getElementById('welcome');
+        
+        // المسار إلى المجلد 'manuel' الذي أنشأته
+        const filePath = `manuel/${fileName}`;
+        
+        // تحديث مصدر الإطار وعرضه
+        viewer.src = filePath;
+        viewer.style.display = 'block';
+        welcome.style.display = 'none';
+    }
 
-    // الحصول على الرابط الكامل لموقعك 
-
-    Const fullUrl = window.location.origin + window.location.pathname + ‘manuel/’ + fileName; 
-
-     
-
-    // استخدام عارض جوجل لفتح الملف 
-
-    Const googleViewerUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(fullUrl)}&embedded=true`; 
-
-     
-
-    Window.location.href = googleViewerUrl; 
-
-} 
+    // تسجيل Service Worker ليعمل التطبيق بدون إنترنت
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('sw.js')
+                .then(reg => console.log('Service Worker Registered'))
+                .catch(err => console.log('Service Worker Failed', err));
+        });
+    }
 </script> 
 </body>
 </html>
