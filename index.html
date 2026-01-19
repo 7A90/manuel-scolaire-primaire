@@ -113,29 +113,42 @@
     </main>
 </div>
 
-<script>
-    function openBook(fileName) {
-        const viewer = document.getElementById('pdf-viewer');
-        const welcome = document.getElementById('welcome');
-        
-        // المسار إلى المجلد 'manuel' الذي أنشأته
-        const filePath = `manuel/${fileName}`;
-        
-        // تحديث مصدر الإطار وعرضه
-        viewer.src = filePath;
-        viewer.style.display = 'block';
-        welcome.style.display = 'none';
-    }
+<script> 
 
-    // تسجيل Service Worker ليعمل التطبيق بدون إنترنت
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('sw.js')
-                .then(reg => console.log('Service Worker Registered'))
-                .catch(err => console.log('Service Worker Failed', err));
-        });
-    }
-</script>
+    Function openBook(fileName) { 
 
+        // المسار المباشر للكتاب 
+
+        Const filePath = `manuel/${fileName}`; 
+
+         
+
+        // بدلاً من العرض داخل الصفحة، سنوجه المتصفح لفتح الملف مباشرة 
+
+        // هذا سيجعل المتصفح يفتح قارئ الـ PDF المدمج في الهاتف 
+
+        Window.location.href = filePath; 
+
+    } 
+
+ 
+
+    // تسجيل الـ Service Worker 
+
+    If (‘serviceWorker’ in navigator) { 
+
+        Window.addEventListener(‘load’, () => { 
+
+            Navigator.serviceWorker.register(‘sw.js’) 
+
+                .then(reg => console.log(‘Service Worker Registered’)) 
+
+                .catch(err => console.log(‘Service Worker Failed’, err)); 
+
+        }); 
+
+    } 
+
+</script> 
 </body>
 </html>
