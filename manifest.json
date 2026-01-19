@@ -1,20 +1,22 @@
 {
-  "short_name": "MonLivre",
-  "name": "Mon Lecteur de PDF",
+  "name": "تطبيق الكتاب المدرسي",
+  "short_name": "مناهجي",
+  "description": "تطبيق لعرض الكتب المدرسية",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#3498db",
   "icons": [
     {
-      "src": "icone-192.png",
-      "type": "image/png",
-      "sizes": "192x192"
+      "src": "https://via.placeholder.com/192.png?text=App",
+      "sizes": "192x192",
+      "type": "image/png"
     },
     {
-      "src": "icone-512.png",
-      "type": "image/png",
-      "sizes": "512x512"
+      "src": "https://via.placeholder.com/512.png?text=App",
+      "sizes": "512x512",
+      "type": "image/png"
     }
-  ],
-  "start_url": "/index.html",
-  "background_color": "#444444",
-  "display": "standalone",
-  "theme_color": "#222222"
+  ]
 }
+2. ملف index.html (طريقة "الفتح المباشر" لتجنب خطأ 404)
