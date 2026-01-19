@@ -4,12 +4,12 @@ const ASSETS_TO_CACHE = [
   './',
   './index.html',
   './manifest.json',
-  './livre1.pdf',
-  './livre2.pdf',
-  './livre3.pdf',
-  './livre4.pdf',
-  './livre5.pdf',
-  './livre6.pdf',
+   'manuel/livre1.pdf',
+  'manuel/livre2.pdf',
+  'manuel/livre3.pdf',
+  'manuel/livre4.pdf',
+  'manuel/livre5.pdf',
+  'manuel/livre6.pdf'
   './icone-192.png',
   './icone-512.png',
   'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js'
@@ -33,4 +33,5 @@ self.addEventListener('fetch', (event) => {
     })
   );
 });
+
 
