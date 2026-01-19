@@ -115,39 +115,31 @@
 
 <script> 
 
-    Function openBook(fileName) { 
+   Function openBook(fileName) { 
 
-        // المسار المباشر للكتاب 
+    // بناء المسار الصحيح 
 
-        Const filePath = `manuel/${fileName}`; 
+    Const filePath = `./manuel/${fileName}`; 
 
-         
+     
 
-        // بدلاً من العرض داخل الصفحة، سنوجه المتصفح لفتح الملف مباشرة 
+    // إنشاء رابط وهمي والضغط عليه برمجياً لضمان استجابة المتصفح 
 
-        // هذا سيجعل المتصفح يفتح قارئ الـ PDF المدمج في الهاتف 
+    Const link = document.createElement(‘a’); 
 
-        Window.location.href = filePath; 
+    Link.href = filePath; 
 
-    } 
+    Link.target = ‘_blank’; // لفتح الكتاب في صفحة جديدة 
 
- 
+    Link.rel = ‘noopener noreferrer’; 
 
-    // تسجيل الـ Service Worker 
+    Document.body.appendChild(link); 
 
-    If (‘serviceWorker’ in navigator) { 
+    Link.click(); 
 
-        Window.addEventListener(‘load’, () => { 
+    Document.body.removeChild(link); 
 
-            Navigator.serviceWorker.register(‘sw.js’) 
-
-                .then(reg => console.log(‘Service Worker Registered’)) 
-
-                .catch(err => console.log(‘Service Worker Failed’, err)); 
-
-        }); 
-
-    } 
+} 
 
 </script> 
 </body>
