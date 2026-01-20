@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>مكتبة الأستاذ - اللغة الفرنسية</title>
     <link rel="manifest" href="manifest.json">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -208,62 +207,10 @@
             padding: 15px 20px;
             border-bottom: 2px solid var(--border);
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
             align-items: center;
             flex-wrap: wrap;
             gap: 10px;
-        }
-
-        .toolbar-left {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-        .toolbar-btn {
-            padding: 8px 16px;
-            border: 2px solid var(--border);
-            background: white;
-            color: var(--text-dark);
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 500;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .toolbar-btn:hover:not(:disabled) {
-            background: var(--secondary);
-            color: white;
-            border-color: var(--secondary);
-        }
-
-        .toolbar-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .page-controls {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .page-input {
-            width: 60px;
-            padding: 6px;
-            border: 2px solid var(--border);
-            border-radius: 6px;
-            text-align: center;
-            font-size: 14px;
-        }
-
-        .page-info {
-            font-size: 14px;
-            color: var(--text-dark);
         }
 
         .current-book-info {
@@ -278,24 +225,17 @@
             align-items: center;
             justify-content: center;
             padding: 20px;
-            overflow: auto;
+            overflow: hidden;
             position: relative;
         }
 
-        #pdf-container {
+        #pdf-embed {
             display: none;
             width: 100%;
             height: 100%;
-            overflow: auto;
-            background: #525659;
+            border: none;
             border-radius: 12px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        }
-
-        #pdf-canvas {
-            display: block;
-            margin: 20px auto;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
             background: white;
         }
 
@@ -319,28 +259,6 @@
             color: #64748b;
             font-size: 16px;
             line-height: 1.6;
-        }
-
-        .loading {
-            text-align: center;
-            color: var(--text-dark);
-            padding: 40px;
-            display: none;
-        }
-
-        .loading-spinner {
-            border: 4px solid #f3f4f6;
-            border-top: 4px solid var(--secondary);
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
         }
 
         @media (max-width: 768px) {
@@ -373,18 +291,6 @@
                 padding: 10px;
             }
 
-            .toolbar-left {
-                width: 100%;
-            }
-
-            .toolbar-btn {
-                flex: 1;
-                min-width: 100px;
-                justify-content: center;
-                font-size: 12px;
-                padding: 6px 10px;
-            }
-
             .current-book-info {
                 width: 100%;
                 text-align: center;
@@ -392,38 +298,21 @@
             }
         }
 
-        .sidebar::-webkit-scrollbar,
-        #pdf-container::-webkit-scrollbar {
+        .sidebar::-webkit-scrollbar {
             width: 8px;
         }
 
-        .sidebar::-webkit-scrollbar-track,
-        #pdf-container::-webkit-scrollbar-track {
+        .sidebar::-webkit-scrollbar-track {
             background: #f1f5f9;
         }
 
-        .sidebar::-webkit-scrollbar-thumb,
-        #pdf-container::-webkit-scrollbar-thumb {
+        .sidebar::-webkit-scrollbar-thumb {
             background: #cbd5e1;
             border-radius: 4px;
         }
 
-        .sidebar::-webkit-scrollbar-thumb:hover,
-        #pdf-container::-webkit-scrollbar-thumb:hover {
+        .sidebar::-webkit-scrollbar-thumb:hover {
             background: #94a3b8;
-        }
-
-        .zoom-controls {
-            display: flex;
-            gap: 5px;
-            align-items: center;
-        }
-
-        .zoom-value {
-            font-size: 14px;
-            color: var(--text-dark);
-            min-width: 50px;
-            text-align: center;
         }
     </style>
 </head>
@@ -499,30 +388,6 @@
 
         <main class="viewer-area">
             <div class="viewer-toolbar">
-                <div class="toolbar-left">
-                    <div class="page-controls">
-                        <button class="toolbar-btn" id="prev-page" onclick="previousPage()" disabled>
-                            <span>◄</span> <span>السابقة</span>
-                        </button>
-                        <input type="number" id="page-input" class="page-input" min="1" onchange="goToPage()" disabled>
-                        <span class="page-info" id="page-info">/ 0</span>
-                        <button class="toolbar-btn" id="next-page" onclick="nextPage()" disabled>
-                            <span>التالية</span> <span>►</span>
-                        </button>
-                    </div>
-                    <div class="zoom-controls">
-                        <button class="toolbar-btn" onclick="zoomOut()" id="zoom-out" disabled>
-                            <span>-</span>
-                        </button>
-                        <span class="zoom-value" id="zoom-value">100%</span>
-                        <button class="toolbar-btn" onclick="zoomIn()" id="zoom-in" disabled>
-                            <span>+</span>
-                        </button>
-                    </div>
-                    <button class="toolbar-btn" onclick="downloadBook()" id="download-btn" disabled>
-                        <span>⬇️</span> <span>تحميل</span>
-                    </button>
-                </div>
                 <div class="current-book-info" id="current-book-name">
                     لم يتم اختيار كتاب
                 </div>
@@ -531,169 +396,32 @@
                 <div id="welcome" class="welcome-screen">
                     <div class="welcome-icon">📖</div>
                     <h2>مرحباً بك في مكتبة الأستاذ</h2>
-                    <p>اختر كتاباً من القائمة الجانبية لبدء العرض والاستعداد للدرس</p>
+                    <p>اختر كتاباً من القائمة الجانبية لفتحه مباشرة</p>
                 </div>
-                <div class="loading" id="loading">
-                    <div class="loading-spinner"></div>
-                    <p>جاري تحميل الكتاب...</p>
-                </div>
-                <div id="pdf-container">
-                    <canvas id="pdf-canvas"></canvas>
-                </div>
+                <embed id="pdf-embed" type="application/pdf">
             </div>
         </main>
     </div>
 </div>
 
 <script>
-    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-    
-    let pdfDoc = null;
-    let pageNum = 1;
-    let pageRendering = false;
-    let pageNumPending = null;
-    let scale = 1.5;
-    let currentBookPath = '';
-    let currentBookName = '';
-
-    const canvas = document.getElementById('pdf-canvas');
-    const ctx = canvas.getContext('2d');
-
-    function renderPage(num) {
-        pageRendering = true;
-        pdfDoc.getPage(num).then(function(page) {
-            const viewport = page.getViewport({ scale: scale });
-            canvas.height = viewport.height;
-            canvas.width = viewport.width;
-
-            const renderContext = {
-                canvasContext: ctx,
-                viewport: viewport
-            };
-
-            const renderTask = page.render(renderContext);
-
-            renderTask.promise.then(function() {
-                pageRendering = false;
-                if (pageNumPending !== null) {
-                    renderPage(pageNumPending);
-                    pageNumPending = null;
-                }
-            });
-        });
-
-        document.getElementById('page-input').value = num;
-    }
-
-    function queueRenderPage(num) {
-        if (pageRendering) {
-            pageNumPending = num;
-        } else {
-            renderPage(num);
-        }
-    }
-
-    function previousPage() {
-        if (pageNum <= 1) {
-            return;
-        }
-        pageNum--;
-        queueRenderPage(pageNum);
-        updatePageButtons();
-    }
-
-    function nextPage() {
-        if (pageNum >= pdfDoc.numPages) {
-            return;
-        }
-        pageNum++;
-        queueRenderPage(pageNum);
-        updatePageButtons();
-    }
-
-    function goToPage() {
-        const input = document.getElementById('page-input');
-        const page = parseInt(input.value);
-        if (page >= 1 && page <= pdfDoc.numPages) {
-            pageNum = page;
-            queueRenderPage(pageNum);
-            updatePageButtons();
-        } else {
-            input.value = pageNum;
-        }
-    }
-
-    function updatePageButtons() {
-        document.getElementById('prev-page').disabled = pageNum <= 1;
-        document.getElementById('next-page').disabled = pageNum >= pdfDoc.numPages;
-    }
-
-    function zoomIn() {
-        scale += 0.25;
-        if (scale > 3) scale = 3;
-        document.getElementById('zoom-value').textContent = Math.round(scale * 100) + '%';
-        queueRenderPage(pageNum);
-    }
-
-    function zoomOut() {
-        scale -= 0.25;
-        if (scale < 0.5) scale = 0.5;
-        document.getElementById('zoom-value').textContent = Math.round(scale * 100) + '%';
-        queueRenderPage(pageNum);
-    }
-
     function openBook(filePath, bookTitle, type, element) {
-        currentBookPath = filePath;
-        currentBookName = bookTitle;
+        // فتح الكتاب في تبويب جديد مباشرة
+        window.open(filePath, '_blank');
         
-        document.getElementById('welcome').style.display = 'none';
-        document.getElementById('pdf-container').style.display = 'none';
-        document.getElementById('loading').style.display = 'block';
-        document.getElementById('current-book-name').textContent = bookTitle;
+        // تحديث الواجهة
+        const bookNameDisplay = document.getElementById('current-book-name');
+        bookNameDisplay.textContent = 'تم فتح: ' + bookTitle;
 
+        // تحديث البطاقة النشطة
         const allCards = document.querySelectorAll('.book-card');
         allCards.forEach(card => card.classList.remove('active'));
         if (element) {
             element.classList.add('active');
         }
-
-        pdfjsLib.getDocument(filePath).promise.then(function(pdf) {
-            pdfDoc = pdf;
-            document.getElementById('page-info').textContent = '/ ' + pdf.numPages;
-            document.getElementById('page-input').max = pdf.numPages;
-            document.getElementById('page-input').disabled = false;
-            
-            document.getElementById('prev-page').disabled = false;
-            document.getElementById('next-page').disabled = false;
-            document.getElementById('zoom-in').disabled = false;
-            document.getElementById('zoom-out').disabled = false;
-            document.getElementById('download-btn').disabled = false;
-
-            pageNum = 1;
-            scale = 1.5;
-            document.getElementById('zoom-value').textContent = '100%';
-            
-            document.getElementById('loading').style.display = 'none';
-            document.getElementById('pdf-container').style.display = 'block';
-            
-            renderPage(pageNum);
-            updatePageButtons();
-        }).catch(function(error) {
-            console.error('خطأ في تحميل الكتاب:', error);
-            document.getElementById('loading').style.display = 'none';
-            alert('حدث خطأ في تحميل الكتاب. الرجاء المحاولة مرة أخرى.');
-        });
     }
 
-    function downloadBook() {
-        if (currentBookPath) {
-            const link = document.createElement('a');
-            link.href = currentBookPath;
-            link.download = currentBookPath.split('/').pop();
-            link.click();
-        }
-    }
-
+    // Service Worker
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', function() {
             navigator.serviceWorker.register('sw.js')
