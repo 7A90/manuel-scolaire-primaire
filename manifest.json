@@ -19,24 +19,19 @@
       "type": "image/png",
       "sizes": "512x512"
     }
-    "screenshots": [
-  {
-    "src": "screenshot.png",
-    "sizes": "1814x857",
-    "type": "image/png",
-    "form_factor": "wide"
-  }
-]
-
   ],
-  "theme_color": "#000000",
-  "background_color": "#000000",
+  "screenshots": [
+    {
+      "src": "screenshot.png",
+      "sizes": "1814x857",
+      "type": "image/png",
+      "form_factor": "wide"
+    }
+  ],
   "categories": [
     "books",
     "education"
   ]
-
 }
-
 
 
