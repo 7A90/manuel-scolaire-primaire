@@ -10,14 +10,16 @@
   "theme_color": "#3498db",
   "icons": [
     {
-      "src": "https://via.placeholder.com/192.png?text=Book",
-      "sizes": "192x192",
-      "type": "image/png"
+      "src": "icone-192.png",
+      "type": "image/png",
+      "sizes": "192x192"
     },
     {
-      "src": "https://via.placeholder.com/512.png?text=Book",
-      "sizes": "512x512",
-      "type": "image/png"
+      "src": "icone-512.png",
+      "type": "image/png",
+      "sizes": "512x512"
     }
+
   ]
 }
+
