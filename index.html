@@ -3,139 +3,524 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مكتبتي المدرسية</title>
+    <title>مكتبة الأستاذ - اللغة الفرنسية</title>
     <link rel="manifest" href="manifest.json">
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         :root {
-            --primary-color: #2c3e50;
-            --accent-color: #3498db;
-            --bg-color: #ecf0f1;
+            --primary: #1e3a8a;
+            --secondary: #3b82f6;
+            --accent: #10b981;
+            --danger: #ef4444;
+            --bg-light: #f8fafc;
+            --text-dark: #1e293b;
+            --border: #e2e8f0;
         }
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: var(--bg-color);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .app-container {
             display: flex;
             flex-direction: column;
             height: 100vh;
+            max-width: 1600px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
         }
 
         header {
-            background-color: var(--primary-color);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
             color: white;
-            padding: 15px;
-            text-align: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            padding: 20px 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
 
-        /* قائمة الكتب الجانبية */
-        .container {
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo {
+            width: 50px;
+            height: 50px;
+            background: white;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .title-section h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .title-section p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .teacher-badge {
+            background: rgba(255,255,255,0.2);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .main-content {
             display: flex;
             flex: 1;
             overflow: hidden;
         }
 
-        nav {
-            width: 200px;
-            background: white;
-            border-left: 1px solid #ddd;
+        .sidebar {
+            width: 320px;
+            background: var(--bg-light);
+            border-left: 2px solid var(--border);
+            display: flex;
+            flex-direction: column;
             overflow-y: auto;
-            padding: 10px;
         }
 
-        nav button {
-            width: 100%;
-            padding: 12px;
+        .sidebar-header {
+            padding: 20px;
+            background: white;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .sidebar-header h2 {
+            color: var(--text-dark);
+            font-size: 18px;
             margin-bottom: 8px;
-            border: none;
-            background-color: var(--accent-color);
-            color: white;
-            border-radius: 5px;
-            cursor: pointer;
+        }
+
+        .sidebar-header p {
+            color: #64748b;
             font-size: 14px;
-            transition: background 0.3s;
         }
 
-        nav button:hover {
-            background-color: #2980b9;
+        .books-grid {
+            padding: 15px;
         }
 
-        /* منطقة عرض الكتاب */
-        main {
+        .grade-section {
+            margin-bottom: 25px;
+        }
+
+        .grade-title {
+            color: var(--text-dark);
+            font-size: 16px;
+            font-weight: 600;
+            padding: 10px 15px;
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .book-card {
+            background: white;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .book-card:hover {
+            border-color: var(--secondary);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .book-card.active {
+            border-color: var(--secondary);
+            background: linear-gradient(135deg, #dbeafe 0%, #eff6ff 100%);
+        }
+
+        .book-type {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .book-type.manuel {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .book-type.cahier {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .book-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 6px;
+        }
+
+        .book-subtitle {
+            font-size: 13px;
+            color: #64748b;
+        }
+
+        .viewer-area {
             flex: 1;
             display: flex;
             flex-direction: column;
-            background: #95a5a6;
+            background: #f1f5f9;
+        }
+
+        .viewer-toolbar {
+            background: white;
+            padding: 15px 20px;
+            border-bottom: 2px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .toolbar-left {
+            display: flex;
+            gap: 10px;
+        }
+
+        .toolbar-btn {
+            padding: 8px 16px;
+            border: 2px solid var(--border);
+            background: white;
+            color: var(--text-dark);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .toolbar-btn:hover {
+            background: var(--secondary);
+            color: white;
+            border-color: var(--secondary);
+        }
+
+        .current-book-info {
+            font-size: 15px;
+            color: var(--text-dark);
+            font-weight: 600;
+        }
+
+        .viewer-content {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow: hidden;
         }
 
         #pdf-viewer {
             width: 100%;
             height: 100%;
             border: none;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            display: none;
         }
 
-        .welcome-msg {
+        .welcome-screen {
             text-align: center;
-            margin-top: 20%;
-            color: white;
+            max-width: 500px;
         }
 
-        @media (max-width: 600px) {
-            .container { flex-direction: column; }
-            nav { width: 100%; height: auto; display: flex; overflow-x: auto; white-space: nowrap; }
-            nav button { width: auto; margin: 0 5px; }
+        .welcome-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+        }
+
+        .welcome-screen h2 {
+            color: var(--text-dark);
+            font-size: 28px;
+            margin-bottom: 12px;
+        }
+
+        .welcome-screen p {
+            color: #64748b;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 768px) {
+            .app-container {
+                box-shadow: none;
+            }
+
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .teacher-badge {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .main-content {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                max-height: 40vh;
+                border-left: none;
+                border-bottom: 2px solid var(--border);
+            }
+
+            .viewer-toolbar {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .toolbar-left {
+                width: 100%;
+                flex-wrap: wrap;
+            }
+
+            .toolbar-btn {
+                flex: 1;
+                min-width: 120px;
+                justify-content: center;
+            }
+
+            .current-book-info {
+                width: 100%;
+                text-align: center;
+            }
+        }
+
+        .sidebar::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .sidebar::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
         }
     </style>
 </head>
 <body>
 
-<header>
-    <h1>تطبيق الكتاب المدرسي</h1>
-</header>
-
-<div class="container">
-    <nav>
-        <button onclick="openBook('trim.pdf')">3ManuelScolaire</button>
-        <button onclick="openBook('tric.pdf')">3CahierActivités</button>
-        <button onclick="openBook('qatm.pdf')">4ManuelScolaire</button>
-        <button onclick="openBook('qatc.pdf')">4CahierActivités</button>
-        <button onclick="openBook('cinqm.pdf')">5ManuelScolaire</button>
-        <button onclick="openBook('cinqc.pdf')">5CahierActivités</button>
-    </nav>
-
-    <main id="content-area">
-        <div id="welcome" class="welcome-msg">
-            <h2>اختر كتاباً لبدء القراءة</h2>
+<div class="app-container">
+    <header>
+        <div class="header-content">
+            <div class="logo-section">
+                <div class="logo">📚</div>
+                <div class="title-section">
+                    <h1>مكتبة الأستاذ</h1>
+                    <p>كتب اللغة الفرنسية المدرسية</p>
+                </div>
+            </div>
+            <div class="teacher-badge">
+                <span>👨‍🏫</span>
+                <span>منصة خاصة بالأساتذة</span>
+            </div>
         </div>
-        <iframe id="pdf-viewer" style="display: none;"></iframe>
-    </main>
+    </header>
+
+    <div class="main-content">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>المكتبة الرقمية</h2>
+                <p>اختر الكتاب الذي تريد عرضه</p>
+            </div>
+            <div class="books-grid">
+                <div class="grade-section">
+                    <div class="grade-title">📖 السنة الثالثة</div>
+                    <div class="book-card" onclick="openBook('trim.pdf', 'السنة الثالثة - الكتاب المدرسي', 'manuel', this)">
+                        <span class="book-type manuel">كتاب مدرسي</span>
+                        <div class="book-title">Manuel Scolaire</div>
+                        <div class="book-subtitle">3ème année primaire</div>
+                    </div>
+                    <div class="book-card" onclick="openBook('tric.pdf', 'السنة الثالثة - كراس الأنشطة', 'cahier', this)">
+                        <span class="book-type cahier">كراس أنشطة</span>
+                        <div class="book-title">Cahier d'Activités</div>
+                        <div class="book-subtitle">3ème année primaire</div>
+                    </div>
+                </div>
+
+                <div class="grade-section">
+                    <div class="grade-title">📗 السنة الرابعة</div>
+                    <div class="book-card" onclick="openBook('qatm.pdf', 'السنة الرابعة - الكتاب المدرسي', 'manuel', this)">
+                        <span class="book-type manuel">كتاب مدرسي</span>
+                        <div class="book-title">Manuel Scolaire</div>
+                        <div class="book-subtitle">4ème année primaire</div>
+                    </div>
+                    <div class="book-card" onclick="openBook('qatc.pdf', 'السنة الرابعة - كراس الأنشطة', 'cahier', this)">
+                        <span class="book-type cahier">كراس أنشطة</span>
+                        <div class="book-title">Cahier d'Activités</div>
+                        <div class="book-subtitle">4ème année primaire</div>
+                    </div>
+                </div>
+
+                <div class="grade-section">
+                    <div class="grade-title">📘 السنة الخامسة</div>
+                    <div class="book-card" onclick="openBook('cinqm.pdf', 'السنة الخامسة - الكتاب المدرسي', 'manuel', this)">
+                        <span class="book-type manuel">كتاب مدرسي</span>
+                        <div class="book-title">Manuel Scolaire</div>
+                        <div class="book-subtitle">5ème année primaire</div>
+                    </div>
+                    <div class="book-card" onclick="openBook('cinqc.pdf', 'السنة الخامسة - كراس الأنشطة', 'cahier', this)">
+                        <span class="book-type cahier">كراس أنشطة</span>
+                        <div class="book-title">Cahier d'Activités</div>
+                        <div class="book-subtitle">5ème année primaire</div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <main class="viewer-area">
+            <div class="viewer-toolbar">
+                <div class="toolbar-left">
+                    <button class="toolbar-btn" onclick="printBook()">
+                        <span>🖨️</span> <span>طباعة</span>
+                    </button>
+                    <button class="toolbar-btn" onclick="downloadBook()">
+                        <span>⬇️</span> <span>تحميل</span>
+                    </button>
+                    <button class="toolbar-btn" onclick="fullscreenViewer()">
+                        <span>⛶</span> <span>ملء الشاشة</span>
+                    </button>
+                </div>
+                <div class="current-book-info" id="current-book-name">
+                    لم يتم اختيار كتاب
+                </div>
+            </div>
+            <div class="viewer-content">
+                <div id="welcome" class="welcome-screen">
+                    <div class="welcome-icon">📖</div>
+                    <h2>مرحباً بك في مكتبة الأستاذ</h2>
+                    <p>اختر كتاباً من القائمة الجانبية لبدء العرض والاستعداد للدرس</p>
+                </div>
+                <iframe id="pdf-viewer"></iframe>
+            </div>
+        </main>
+    </div>
 </div>
 
-<script> 
+<script>
+    var currentBookPath = '';
 
-   function openBook(fileName) {
-        const viewer = document.getElementById('pdf-viewer');
-        const welcome = document.getElementById('welcome');
+    function openBook(fileName, bookTitle, type, element) {
+        var viewer = document.getElementById('pdf-viewer');
+        var welcome = document.getElementById('welcome');
+        var bookNameDisplay = document.getElementById('current-book-name');
         
-        // المسار إلى المجلد 'manuel' الذي أنشأته
-        const filePath = `manuel/${fileName}`;
+        var filePath = 'manuel/' + fileName;
+        currentBookPath = filePath;
         
-        // تحديث مصدر الإطار وعرضه
         viewer.src = filePath;
         viewer.style.display = 'block';
         welcome.style.display = 'none';
+        bookNameDisplay.textContent = bookTitle;
+
+        var allCards = document.querySelectorAll('.book-card');
+        for (var i = 0; i < allCards.length; i++) {
+            allCards[i].classList.remove('active');
+        }
+        
+        if (element) {
+            element.classList.add('active');
+        }
     }
 
-    // تسجيل Service Worker ليعمل التطبيق بدون إنترنت
+    function printBook() {
+        var viewer = document.getElementById('pdf-viewer');
+        if (viewer.style.display === 'block') {
+            viewer.contentWindow.print();
+        } else {
+            alert('الرجاء اختيار كتاب أولاً');
+        }
+    }
+
+    function downloadBook() {
+        if (currentBookPath) {
+            var link = document.createElement('a');
+            link.href = currentBookPath;
+            link.download = currentBookPath.split('/').pop();
+            link.click();
+        } else {
+            alert('الرجاء اختيار كتاب أولاً');
+        }
+    }
+
+    function fullscreenViewer() {
+        var viewer = document.getElementById('pdf-viewer');
+        if (viewer.style.display === 'block') {
+            if (viewer.requestFullscreen) {
+                viewer.requestFullscreen();
+            } else if (viewer.webkitRequestFullscreen) {
+                viewer.webkitRequestFullscreen();
+            } else if (viewer.msRequestFullscreen) {
+                viewer.msRequestFullscreen();
+            }
+        } else {
+            alert('الرجاء اختيار كتاب أولاً');
+        }
+    }
+
     if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
+        window.addEventListener('load', function() {
             navigator.serviceWorker.register('sw.js')
-                .then(reg => console.log('Service Worker Registered'))
-                .catch(err => console.log('Service Worker Failed', err));
+                .then(function(reg) { 
+                    console.log('Service Worker مسجل بنجاح'); 
+                })
+                .catch(function(err) { 
+                    console.log('فشل تسجيل Service Worker', err); 
+                });
         });
     }
-</script> 
+</script>
+
 </body>
 </html>
